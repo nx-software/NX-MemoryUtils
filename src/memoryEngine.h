@@ -1,6 +1,6 @@
 /*
 	NX-Software Memory Utilities
-	memory.h - File for getting program memory
+	memoryEngine.h - Main memory analysis engine
     Copyright (C) 2025 Electro-Corp
 
     This program is free software: you can redistribute it and/or modify
@@ -18,4 +18,14 @@
 */
 #pragma once
 
+#include <string>
 
+class MemoryEngine{
+private:
+public:
+    MemoryEngine();
+
+    // Attempt to add an executable
+    bool addProgram(std::string name);
+    bool addProgram(int pid);
+};

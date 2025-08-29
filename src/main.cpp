@@ -19,9 +19,13 @@
 
 #include <iostream>
 
+#include "memoryEngine.h"
+
 #define VERSION_MAJOR_NUM 0
 #define VERSION_MINOR_NUM 1
 #define COPYRIGHT_YEARS "2025"
+
+MemoryEngine* nxMemory;
 
 void commandLineHelp();
 
@@ -29,10 +33,14 @@ void commandLineHelp();
 void commandInputLoop();
 void processSelectLoop();
 
+void cleanUp();
+
 int main(int args, char* argv[]){
     printf("================= NX-MemoryUtils =================\n");
     printf("Version %d.%d - (c) %s NX-Software {@Electro-Corp}\n", VERSION_MAJOR_NUM, VERSION_MINOR_NUM, COPYRIGHT_YEARS);
     printf("==================================================\n");
+    printf("Creating NXMemoryEngine....\n");
+    nxMemory = new MemoryEngine();
     printf("Entering command line now, type 'h' for help.\n");
 
     commandInputLoop();
@@ -84,8 +92,17 @@ void processSelectLoop(){
         std::cin >> c;
 
         if(c.c_str()[0] == 'q' && c.length() < 2){
-            printf("Exiting process select mode.\n")
+            printf("Exiting process select mode.\n");
             commandInputLoop();
+        }else{
+            // Do we recognize this
+            bool result = false;
+            if(isName) result = nxMemory->addProgram(std::stoi(c));
+            else result = nxMemory->addProgram(c);
+
+            if(!result){
+                printf("Invalid!\n");
+            }
         }
     }
 }
@@ -94,4 +111,8 @@ void commandLineHelp(){
     printf("NX-MemUtils commands:\n");
     printf("h - Show this help\n");
     printf("p - Select process\n");
+}
+
+void cleanUp(){
+    delete nxMemory;
 }
