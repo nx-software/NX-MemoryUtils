@@ -39,7 +39,7 @@ int main(int args, char* argv[]){
     printf("================= NX-MemoryUtils =================\n");
     printf("Version %d.%d - (c) %s NX-Software {@Electro-Corp}\n", VERSION_MAJOR_NUM, VERSION_MINOR_NUM, COPYRIGHT_YEARS);
     printf("==================================================\n");
-    printf("Creating NXMemoryEngine....\n");
+    printf("Starting NXMemoryEngine....\n");
     nxMemory = new MemoryEngine();
     printf("Entering command line now, type 'h' for help.\n");
 
@@ -64,6 +64,12 @@ void commandInputLoop(){
                 break;
             case 'p':
                 processSelectLoop();
+                break;
+            case 'q':
+                exit(0);
+                break;
+            case 'a':
+                printf("NX-MemoryUtil - (c) NX-Software {@ElectroCorp}\n");
                 break;
             default:
                 printf("Unrecognized command. Type 'h' for help.\n");
@@ -97,11 +103,23 @@ void processSelectLoop(){
         }else{
             // Do we recognize this
             bool result = false;
-            if(isName) result = nxMemory->addProgram(std::stoi(c));
+            if(!isName){ 
+                try{
+                    result = nxMemory->addProgram(std::stoi(c));
+                } catch(std::invalid_argument& e){
+                    printf("Error: PID contained something other than numbers!\n");
+                    result = false;
+                } catch(std::out_of_range& e){
+                    printf("Error: PID too large!\n");
+                    result = false;
+                }
+            }
             else result = nxMemory->addProgram(c);
 
             if(!result){
-                printf("Invalid!\n");
+                printf("Process select failed!\n");
+            }else{
+                printf("Process selected.\n");
             }
         }
     }
@@ -111,6 +129,8 @@ void commandLineHelp(){
     printf("NX-MemUtils commands:\n");
     printf("h - Show this help\n");
     printf("p - Select process\n");
+    printf("a - Show about\n");
+    printf("q - Quit program\n");
 }
 
 void cleanUp(){

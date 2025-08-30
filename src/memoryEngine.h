@@ -19,9 +19,18 @@
 #pragma once
 
 #include <string>
+#include <fstream>
+#include <sys/types.h>
+#include <signal.h>
 
 class MemoryEngine{
 private:
+    int pid;
+
+    // does pid exist
+    bool doesPIDExist(int pid);
+    // get name from pid
+    std::string getNameFromPID(int pid);
 public:
     MemoryEngine();
 
