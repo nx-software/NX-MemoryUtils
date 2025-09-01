@@ -10,13 +10,23 @@ bool MemoryEngine::addProgram(std::string name){
 }
 
 bool MemoryEngine::addProgram(int pid){
-    if(!doesPIDExist(pid)) return false;
+    // check if its a program
+    if(!doesPIDExist(pid)){
+        this->pid = -1;
+        return false;
+    }
+    // get name
     printf("Selecting process %d - %s", pid, getNameFromPID(pid).c_str());
+    // set pid as ours
+    this->pid = pid;
     return true;
 }
 
-
-
+void MemoryEngine::UpdateMemory(){
+#ifdef __linux__
+    this->lastSnap.memKB = getMemoryKBFromPID(this->pid);
+#endif
+}
 
 //
 // Internal
@@ -44,5 +54,24 @@ std::string MemoryEngine::getNameFromPID(int pid){
 #endif
 #ifdef WIN32_
     return "Win32 Not implemented";
+#endif
+}
+
+// Get memory usage from pid
+long MemoryEngine::getMemoryKBFromPID(int pid){
+#ifdef __linux__
+    std::string procPath = "/proc/" + std::to_string(pid) + "/status";
+    std::ifstream proc(procPath);
+    std::string curLine;
+
+    while(std::getline(proc, curLine)){
+        if(curLine.rfind("VmRSS:", 0) == 0){
+            long rss_kb = 0;
+            std::sscanf(curLine.c_str(), "VmRSS: %ld kB", &rss_kb);
+            return rss_kb;
+        }
+    }
+
+    return -1;
 #endif
 }

@@ -32,6 +32,7 @@ void commandLineHelp();
 // Loops
 void commandInputLoop();
 void processSelectLoop();
+void memoryAnalyzeLoop();
 
 void cleanUp();
 
@@ -59,11 +60,25 @@ void commandInputLoop(){
         switch(c.c_str()[0]){
             case '\n':
                 break;
-            case 'h':
-                commandLineHelp();
-                break;
+            //
+            // Process commmands
+            //
             case 'p':
                 processSelectLoop();
+                break;
+            case 's':
+                if(nxMemory->getPID() == -1){
+                    printf("Error: No process selected.\n");
+                }else{
+                    nxMemory->UpdateMemory();
+                    printf("%d -> %ld kB\n", nxMemory->getPID(), nxMemory->getLastSnap().memKB);
+                }
+                break;
+            //
+            // General commands
+            //
+            case 'h':
+                commandLineHelp();
                 break;
             case 'q':
                 exit(0);
@@ -120,15 +135,21 @@ void processSelectLoop(){
                 printf("Process select failed!\n");
             }else{
                 printf("Process selected.\n");
+                break;
             }
         }
     }
+    commandInputLoop();
 }
 
+
 void commandLineHelp(){
-    printf("NX-MemUtils commands:\n");
-    printf("h - Show this help\n");
+    printf("== NX-MemUtils commands: ==\n");
+    printf("> Process commands: \n");
     printf("p - Select process\n");
+    printf("s - Snapshot of process memory\n");
+    printf("> General commands: \n");
+    printf("h - Show this help\n");
     printf("a - Show about\n");
     printf("q - Quit program\n");
 }

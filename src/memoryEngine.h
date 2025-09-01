@@ -22,19 +22,45 @@
 #include <fstream>
 #include <sys/types.h>
 #include <signal.h>
+#include <sys/resource.h>
+
+typedef struct{
+    int memKB;
+} MemSnapshot;
 
 class MemoryEngine{
 private:
-    int pid;
+    // PID
+    int pid = -1;
+
+    // Last snap
+    MemSnapshot lastSnap;
+
+    // Settings
+    bool logToFile, saveLog;
 
     // does pid exist
     bool doesPIDExist(int pid);
     // get name from pid
     std::string getNameFromPID(int pid);
+    // get memory from pid
+    long getMemoryKBFromPID(int pid);
 public:
     MemoryEngine();
 
     // Attempt to add an executable
     bool addProgram(std::string name);
     bool addProgram(int pid);
+
+    // Grab proc memory at this time
+    void UpdateMemory();
+
+    // Getters
+    int getPID(){
+        return pid;
+    }
+
+    MemSnapshot getLastSnap(){
+        return lastSnap;
+    }
 };
