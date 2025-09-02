@@ -25,7 +25,7 @@
 #include <sys/resource.h>
 
 typedef struct{
-    int memKB;
+    long memKB;
 } MemSnapshot;
 
 class MemoryEngine{

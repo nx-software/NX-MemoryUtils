@@ -18,6 +18,7 @@
 */
 
 #include <iostream>
+#include <ctime>
 
 #include "memoryEngine.h"
 
@@ -33,6 +34,12 @@ void commandLineHelp();
 void commandInputLoop();
 void processSelectLoop();
 void memoryAnalyzeLoop();
+void processSnapshotLoop();
+
+// Signals
+void segfaultSignal(int);
+void interruptSignal(int);
+void setupSignals();
 
 void cleanUp();
 
@@ -42,6 +49,8 @@ int main(int args, char* argv[]){
     printf("==================================================\n");
     printf("Starting NXMemoryEngine....\n");
     nxMemory = new MemoryEngine();
+    printf("Setup signals...\n");
+    setupSignals();
     printf("Entering command line now, type 'h' for help.\n");
 
     commandInputLoop();
@@ -71,7 +80,14 @@ void commandInputLoop(){
                     printf("Error: No process selected.\n");
                 }else{
                     nxMemory->UpdateMemory();
-                    printf("%d -> %ld kB\n", nxMemory->getPID(), nxMemory->getLastSnap().memKB);
+                    printf("%d -> %ld mB\n", nxMemory->getPID(), nxMemory->getLastSnap().memKB / 1024);
+                }
+                break;
+            case 'c':
+                if(nxMemory->getPID() == -1){
+                    printf("Error: No process selected.\n");
+                }else{
+                    processSnapshotLoop();
                 }
                 break;
             //
@@ -142,12 +158,38 @@ void processSelectLoop(){
     commandInputLoop();
 }
 
+void processSnapshotLoop(){
+    printf("Process %d: (Refreshing, CTRL-C to return to command loop)\n", nxMemory->getPID());
+    nxMemory->UpdateMemory();
+    while(1){
+        nxMemory->UpdateMemory();
+        // print
+        printf("%ld mB\r", nxMemory->getLastSnap().memKB / 1024);
+    }
+}
+
+void segfaultSignal(int sig){
+    printf("Segmentation fault, cleaning up...\n");
+    cleanUp();
+    exit(-1);
+}
+
+void interruptSignal(int sig){
+    printf("Exiting current loop, returning to commands.\n");
+    commandInputLoop();
+}
+
+void setupSignals(){
+    signal(SIGINT, interruptSignal);
+    signal(SIGSEGV, segfaultSignal);
+}
 
 void commandLineHelp(){
     printf("== NX-MemUtils commands: ==\n");
     printf("> Process commands: \n");
     printf("p - Select process\n");
     printf("s - Snapshot of process memory\n");
+    printf("c - Constantly refreshing process memory\n");
     printf("> General commands: \n");
     printf("h - Show this help\n");
     printf("a - Show about\n");
