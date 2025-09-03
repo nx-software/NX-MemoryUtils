@@ -6,6 +6,7 @@ project(NX-MemDetect
 
 # Add an executable target
 add_executable(NX-MemDetect
+    src/graph.cpp
     src/memoryEngine.cpp
     src/main.cpp
 )

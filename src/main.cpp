@@ -21,12 +21,14 @@
 #include <ctime>
 
 #include "memoryEngine.h"
+#include "graph.h"
 
 #define VERSION_MAJOR_NUM 0
 #define VERSION_MINOR_NUM 1
 #define COPYRIGHT_YEARS "2025"
 
 MemoryEngine* nxMemory;
+Graph* graph;
 
 void commandLineHelp();
 
@@ -34,7 +36,7 @@ void commandLineHelp();
 void commandInputLoop();
 void processSelectLoop();
 void memoryAnalyzeLoop();
-void processSnapshotLoop();
+void processSnapshotLoop(bool graph);
 
 // Signals
 void segfaultSignal(int);
@@ -87,7 +89,14 @@ void commandInputLoop(){
                 if(nxMemory->getPID() == -1){
                     printf("Error: No process selected.\n");
                 }else{
-                    processSnapshotLoop();
+                    processSnapshotLoop(false);
+                }
+                break;
+            case 'g':
+                if(nxMemory->getPID() == -1){
+                    printf("Error: No process selected.\n");
+                }else{
+                    processSnapshotLoop(true);
                 }
                 break;
             //
@@ -158,13 +167,31 @@ void processSelectLoop(){
     commandInputLoop();
 }
 
-void processSnapshotLoop(){
-    printf("Process %d: (Refreshing, CTRL-C to return to command loop)\n", nxMemory->getPID());
+void processSnapshotLoop(bool graphEnabled){
+    printf("Process %d: (Refreshing every one second, CTRL-C to return to command loop)\n", nxMemory->getPID());
     nxMemory->UpdateMemory();
+
+    if(graphEnabled){
+        graph = new Graph(std::string{"Memory Usage"}, "Time", "Memory (mB)", (int)(nxMemory->getLastSnap().memKB / 1024));
+    }
+
+    long int cur = time(NULL), past = time(NULL);
+
     while(1){
-        nxMemory->UpdateMemory();
-        // print
-        printf("%ld mB\r", nxMemory->getLastSnap().memKB / 1024);
+        cur = time(NULL);
+        if((cur - past) > 1){
+            past = cur;
+            nxMemory->UpdateMemory();
+            // print
+            if(graphEnabled){
+                graph->addPoint((int)nxMemory->getLastSnap().memKB / 1024);
+                graph->render();
+            }else{
+                printf("%ld mB\r", nxMemory->getLastSnap().memKB / 1024);
+            }
+            fflush(stdout);
+        }
+
     }
 }
 
@@ -176,6 +203,8 @@ void segfaultSignal(int sig){
 
 void interruptSignal(int sig){
     printf("Exiting current loop, returning to commands.\n");
+    if(graph) delete graph;
+    signal(SIGINT, interruptSignal);
     commandInputLoop();
 }
 
@@ -190,6 +219,7 @@ void commandLineHelp(){
     printf("p - Select process\n");
     printf("s - Snapshot of process memory\n");
     printf("c - Constantly refreshing process memory\n");
+    printf("g - Constantly refreshing process memory with graph\n");
     printf("> General commands: \n");
     printf("h - Show this help\n");
     printf("a - Show about\n");
@@ -197,5 +227,6 @@ void commandLineHelp(){
 }
 
 void cleanUp(){
+    if(graph) delete graph;
     delete nxMemory;
 }
