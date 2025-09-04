@@ -7,7 +7,6 @@ Graph::Graph(std::string gTitle, std::string xTitle, std::string yTitle, int sta
 
     this->yScale = 10;
 
-    setupAxis(startValue);
     addPoint(startValue);
 }
 
@@ -35,7 +34,7 @@ void Graph::render(){
             // Is there a value here
             if(this->yVals.size() > (xMax - x)){
                 // is it at my y-value
-                if(yVals[xMax - x] >= (yMin + (yR * inc - 1)) && yVals[xMax- x] <= yMin + (yR * (inc + 1))){
+                if(yVals[xMax - x] > (yMin + (yR * (inc - 1))) && yVals[xMax- x] < (yMin + (yR * (inc + 1)))){
                     printf("#");
                 }else{
                     printf("-");
@@ -64,7 +63,7 @@ void Graph::setupAxis(int startingPoint){
         startingPoint = 25;
     }
     // Make it look somewhat even
-    this->yMin = startingPoint - (startingPoint / 2);
-    this->yMax = startingPoint + (startingPoint / 2);
+    this->yMin = startingPoint - (startingPoint / 5);
+    this->yMax = startingPoint + (startingPoint / 5);
     this->xMax = 50;
 }

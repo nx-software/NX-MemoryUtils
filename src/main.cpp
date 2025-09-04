@@ -191,7 +191,6 @@ void processSnapshotLoop(bool graphEnabled){
             }
             fflush(stdout);
         }
-
     }
 }
 
