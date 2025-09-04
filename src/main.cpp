@@ -179,7 +179,7 @@ void processSnapshotLoop(bool graphEnabled){
 
     while(1){
         cur = time(NULL);
-        if((cur - past) > 1){
+        if((cur - past) > 0){
             past = cur;
             nxMemory->UpdateMemory();
             // print

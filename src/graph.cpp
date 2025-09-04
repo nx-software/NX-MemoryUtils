@@ -7,27 +7,35 @@ Graph::Graph(std::string gTitle, std::string xTitle, std::string yTitle, int sta
 
     this->yScale = 10;
 
-    addPoint(startValue);
     setupAxis(startValue);
+    addPoint(startValue);
 }
 
 void Graph::addPoint(int y){
     this->yVals.push_back(y);
+
+    if(this->yVals.size() > xMax){
+        yVals.erase(yVals.begin());
+    }
+
+    setupAxis(y);
 }
 
 void Graph::render(){
-    printf("%s\n", gTitle.c_str());
+    printf("%s (%d, latest %d)\n", gTitle.c_str(), this->yVals.size(), yVals[yVals.size() - 1]);
+    // Top border
     for(int i = 0; i < xMax + 2; i++) printf("=");
-    printf("\n");
+    printf(" (%s) \n", yTitle.c_str());
     // Each increment will be
     int inc = (yMax - yMin) / yScale;
+    // Render graph
     for(int yR = yScale; yR > 0; yR--){
         printf("| ");
         for(int x = 0; x < xMax; x++){
             // Is there a value here
-            if(this->yVals.size() > x){
+            if(this->yVals.size() > (xMax - x)){
                 // is it at my y-value
-                if(yVals[yVals.size() - x] >= (yMin + (yR * inc - 1)) && yVals[yVals.size() - x] <= yMin + (yR * (inc + 1))){
+                if(yVals[xMax - x] >= (yMin + (yR * inc - 1)) && yVals[xMax- x] <= yMin + (yR * (inc + 1))){
                     printf("#");
                 }else{
                     printf(" ");
@@ -38,6 +46,7 @@ void Graph::render(){
         }
         printf("| %d \n", yMin + (yR * inc));
     }
+    // Bottom border
     for(int i = 0; i < xMax + 2; i++) printf("=");
     printf("\n");
 }
@@ -46,6 +55,9 @@ void Graph::render(){
 // Internal funcs
 //
 void Graph::setupAxis(int startingPoint){
+    if(startingPoint < 20){
+        startingPoint = 25;
+    }
     // Make it look somewhat even
     this->yMin = startingPoint - (startingPoint / 2);
     this->yMax = startingPoint + (startingPoint / 2);
