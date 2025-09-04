@@ -24,13 +24,13 @@ void Graph::addPoint(int y){
 void Graph::render(){
     printf("%s (%d, latest %d)\n", gTitle.c_str(), this->yVals.size(), yVals[yVals.size() - 1]);
     // Top border
-    for(int i = 0; i < xMax + 2; i++) printf("=");
+    for(int i = 0; i < xMax + 3; i++) printf("=");
     printf(" (%s) \n", yTitle.c_str());
     // Each increment will be
     int inc = (yMax - yMin) / yScale;
     // Render graph
     for(int yR = yScale; yR > 0; yR--){
-        printf("| ");
+        printf("|-");
         for(int x = 0; x < xMax; x++){
             // Is there a value here
             if(this->yVals.size() > (xMax - x)){
@@ -38,17 +38,22 @@ void Graph::render(){
                 if(yVals[xMax - x] >= (yMin + (yR * inc - 1)) && yVals[xMax- x] <= yMin + (yR * (inc + 1))){
                     printf("#");
                 }else{
-                    printf(" ");
+                    printf("-");
                 }
             }else{
-                printf(" ");
+                printf("-");
             }
         }
         printf("| %d \n", yMin + (yR * inc));
     }
     // Bottom border
-    for(int i = 0; i < xMax + 2; i++) printf("=");
+    for(int i = 0; i < xMax + 3; i++) printf("=");
     printf("\n");
+    for(int i = xMax; i >= 0; i--){
+        if((i - 1) % 10 == 0 || i + 1 == 0) printf("%d", i - 1);
+        else printf(" ");
+    }
+    printf("(%s) \n", xTitle.c_str());
 }
 
 //
