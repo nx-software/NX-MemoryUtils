@@ -177,7 +177,7 @@ void processSnapshotLoop(bool graphEnabled){
 
     long int cur = time(NULL), past = time(NULL);
 
-    while(1){
+    for(;;){
         cur = time(NULL);
         if((cur - past) > 0){
             past = cur;

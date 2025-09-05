@@ -21,7 +21,7 @@ void Graph::addPoint(int y){
 }
 
 void Graph::render(){
-    printf("%s (%d, latest %d)\n", gTitle.c_str(), this->yVals.size(), yVals[yVals.size() - 1]);
+    printf("%s (%d, latest %d) [%d, %d]\n", gTitle.c_str(), this->yVals.size(), yVals[yVals.size() - 1], yMin, yMax);
     // Top border
     for(int i = 0; i < xMax + 3; i++) printf("=");
     printf(" (%s) \n", yTitle.c_str());
@@ -30,7 +30,7 @@ void Graph::render(){
     // Render graph
     for(int yR = yScale; yR > 0; yR--){
         printf("|-");
-        for(int x = 0; x < xMax; x++){
+        for(int x = xMax; x > 0; x--){
             // Is there a value here
             if(this->yVals.size() > (xMax - x)){
                 // is it at my y-value
