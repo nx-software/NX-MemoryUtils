@@ -19,6 +19,8 @@
 
 #include <iostream>
 #include <ctime>
+#include <chrono>
+#include <thread>
 
 #include "memoryEngine.h"
 #include "graph.h"
@@ -175,12 +177,14 @@ void processSnapshotLoop(bool graphEnabled){
         graph = new Graph(std::string{"Memory Usage"}, "Time", "Memory (mB)", (int)(nxMemory->getLastSnap().memKB / 1024));
     }
 
-    long int cur = time(NULL), past = time(NULL);
+    //long int cur = time(NULL), past = time(NULL);
+
+    auto s_t = std::chrono::steady_clock::now();
 
     for(;;){
-        cur = time(NULL);
-        if((cur - past) > 0){
-            past = cur;
+        //cur = time(NULL);
+        //if((cur - past) > 0){
+            //past = cur;
             nxMemory->UpdateMemory();
             // print
             if(graphEnabled){
@@ -190,7 +194,9 @@ void processSnapshotLoop(bool graphEnabled){
                 printf("%ld mB\r", nxMemory->getLastSnap().memKB / 1024);
             }
             fflush(stdout);
-        }
+        //}
+        std::this_thread::sleep_until(s_t + std::chrono::seconds(1));
+        s_t = std::chrono::steady_clock::now();
     }
 }
 
