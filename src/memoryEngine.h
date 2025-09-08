@@ -20,8 +20,11 @@
 
 #include <string>
 #include <fstream>
+#include <memory>
+#include <stdexcept>
 #include <sys/types.h>
 #include <signal.h>
+#include <dirent.h>
 #include <sys/resource.h>
 
 typedef struct{
